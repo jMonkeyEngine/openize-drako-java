@@ -140,44 +140,6 @@ public abstract class Stream implements Closeable {
         }
     }
 
-    static class MemoryStreamAdapter extends MemoryStream
-    {
-        private OutputStream stream;
-        public MemoryStreamAdapter(OutputStream stream)
-        {
-            this.stream = stream;
-        }
-        @Override
-        public void close() throws IOException
-        {
-            try(OutputStream s = stream) {
-                if (data != null)
-                    s.write(data, 0, cursor);
-            }
-        }
-    }
 
-    /**
-     * Wrap an OutputStream as Stream, the stream must be closed to flush data to output stream.
-     * @param stream output stream to wrap
-     * @return wrapped Stream instance
-     */
-    public static Stream wrap(OutputStream stream)
-    {
-        return new MemoryStreamAdapter(stream);
-    }
-    public static Stream wrap(InputStream stream) throws IOException
-    {
-        ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        byte[] buffer = new byte[2048];
-        while(true)
-        {
-            int len = stream.read(buffer);
-            if(len <= 0)
-                break;
-            mem.write(buffer, 0, len);
-        }
-        return new MemoryStream(mem.toByteArray());
-    }
 
 }

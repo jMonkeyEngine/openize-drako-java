@@ -29,6 +29,7 @@ public interface Struct<T> extends Cloneable, Serializable {
     public static <T extends Struct<T>> T byVal(T value) {
         if(value == null)
             return null;
-       return value.clone();
+        Struct s = (Struct)value;
+        return (T)s.clone();
     }
 }
