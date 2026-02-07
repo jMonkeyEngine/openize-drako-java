@@ -31,7 +31,7 @@ jobs:
         run: ./gradlew --no-daemon clean build
 
   publish_github_packages:
-    name: Publish to GitHub Packages (on Release)
+    name: Publish to Maven Central
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
 
@@ -50,7 +50,7 @@ jobs:
           java-version: "21"
           cache: gradle
 
-      - name: Resolve release version (from release name)
+      - name: Resolve release version
         id: ver
         shell: bash
         run: |
@@ -65,12 +65,12 @@ jobs:
           echo "releaseVersion=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Using releaseVersion=${VERSION}"
 
-      - name: Publish to GitHub Packages
+      - name: Publish to Maven Central
         env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
         run: |
           ./gradlew --no-daemon \
             -PreleaseVersion='${{ steps.ver.outputs.releaseVersion }}' \
             clean build \
-            publishMavenJavaPublicationToGitHubPackagesRepository
+            publishToSonatype closeSonatypeStagingRepository
